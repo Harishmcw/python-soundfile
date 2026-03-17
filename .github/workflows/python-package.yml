@@ -35,20 +35,10 @@ jobs:
             python-version: "pypy-3.9"
           - os: windows-latest
             python-version: "pypy-3.10"
-          - os: windows-latest
-            architecture: "arm64"
-          - os: ubuntu-latest
-            architecture: "arm64"
-          - os: macos-latest
-            architecture: "arm64"
           - python-version: "pypy-3.7"
             architecture: "x86"
           - python-version: "pypy-3.8"
             architecture: "x86"
-          - os: windows-11-arm
-            architecture: "x86"
-          - os: windows-11-arm
-            architecture: "x64"
           - os: windows-11-arm
             python-version: "3.9"
           - os: windows-11-arm
