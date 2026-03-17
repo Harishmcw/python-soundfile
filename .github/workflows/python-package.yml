@@ -43,6 +43,16 @@ jobs:
             python-version: "3.9"
           - os: windows-11-arm
             python-version: "3.10"
+          - os: windows-latest
+            architecture: "arm64"
+          - os: ubuntu-latest
+            architecture: "arm64"
+          - os: macos-latest
+            architecture: "arm64"
+          - os: windows-11-arm
+            architecture: "x86"
+          - os: windows-11-arm
+            architecture: "x64"
           - os: windows-11-arm
             python-version: "pypy-3.7"
           - os: windows-11-arm
