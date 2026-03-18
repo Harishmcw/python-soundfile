@@ -35,10 +35,6 @@ jobs:
             python-version: "pypy-3.9"
           - os: windows-latest
             python-version: "pypy-3.10"
-          - python-version: "pypy-3.7"
-            architecture: "x86"
-          - python-version: "pypy-3.8"
-            architecture: "x86"
           - os: windows-11-arm
             python-version: "3.9"
           - os: windows-11-arm
@@ -63,10 +59,10 @@ jobs:
             python-version: "pypy-3.10"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
         with:
           submodules: true
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
