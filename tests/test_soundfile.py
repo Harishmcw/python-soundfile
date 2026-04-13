@@ -46,10 +46,8 @@ def _file_existing(request, filename, fdarg, objarg=None):
         fd = os.open(filename, fdarg)
 
         def finalizer():
-            try:
+            with pytest.raises(OSError):
                 os.close(fd)
-            except OSError:
-                pass
 
         request.addfinalizer(finalizer)
         return fd
