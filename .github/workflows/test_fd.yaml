@@ -25,7 +25,7 @@ jobs:
           allow-prereleases: true
 
       - name: Install dependencies
-        run: pip install soundfile numpy
+        run: pip install soundfile numpy typing_extensions cffi
 
       - name: Write test script
         run: |
