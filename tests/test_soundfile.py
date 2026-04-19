@@ -47,9 +47,12 @@ def _file_existing(request, filename, fdarg, objarg=None):
 
         def finalizer():
             try:
+                os.lseek(fd, 0, os.SEEK_SET)
+            except OSError as exc:
+                assert exc.errno == 9  # the file was closed correctly
+            else:
                 os.close(fd)
-            except OSError:
-                pass
+                pytest.fail("file descriptor not closed correctly")
 
         request.addfinalizer(finalizer)
         return fd
