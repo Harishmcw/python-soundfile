@@ -22,33 +22,37 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
-          allow-prereleases: true  # needed for 3.14
+          allow-prereleases: true
 
       - name: Install dependencies
         run: pip install soundfile numpy
 
-      - name: Test FD behavior
+      - name: Write test script
         run: |
-          python -c "
+          $script = @'
           import os
           import sys
           import numpy as np
           import soundfile as sf
 
-          print(f'Python : {sys.version}')
-          print(f'Arch   : {sys.maxsize > 2**32 and \"x64\" or \"x86\"}')
-          print(f'OS     : ${{ matrix.os }}')
-          print('---')
+          arch = "x64" if sys.maxsize > 2**32 else "x86"
+          print("Python  : " + sys.version)
+          print("Arch    : " + arch)
+          print("---")
 
-          sf.write('test.wav', np.zeros((1000, 2)), 44100)
+          sf.write("test.wav", np.zeros((1000, 2)), 44100)
 
-          fd = os.open('test.wav', os.O_RDONLY)
+          fd = os.open("test.wav", os.O_RDONLY)
           f = sf.SoundFile(fd)
           f.close()
 
           try:
               os.lseek(fd, 0, os.SEEK_SET)
-              print('RESULT: ❌ lseek SUCCEEDED — fd is STILL OPEN (soundfile did NOT close it)')
+              print("RESULT: FAIL — fd is STILL OPEN (soundfile did NOT close it)")
           except OSError as exc:
-              print(f'RESULT: ✅ lseek FAILED errno={exc.errno} — fd is CLOSED correctly')
-          "
+              print("RESULT: PASS — fd is CLOSED correctly, errno=" + str(exc.errno))
+          '@
+          $script | Out-File -FilePath test_fd.py -Encoding utf8
+
+      - name: Run test
+        run: python test_fd.py
