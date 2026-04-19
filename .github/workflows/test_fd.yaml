@@ -1,0 +1,54 @@
+name: Test FD Behavior
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-fd:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        architecture: ['x86', 'x64']
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
+          allow-prereleases: true  # needed for 3.14
+
+      - name: Install dependencies
+        run: pip install soundfile numpy
+
+      - name: Test FD behavior
+        run: |
+          python -c "
+          import os
+          import sys
+          import numpy as np
+          import soundfile as sf
+
+          print(f'Python : {sys.version}')
+          print(f'Arch   : {sys.maxsize > 2**32 and \"x64\" or \"x86\"}')
+          print(f'OS     : ${{ matrix.os }}')
+          print('---')
+
+          sf.write('test.wav', np.zeros((1000, 2)), 44100)
+
+          fd = os.open('test.wav', os.O_RDONLY)
+          f = sf.SoundFile(fd)
+          f.close()
+
+          try:
+              os.lseek(fd, 0, os.SEEK_SET)
+              print('RESULT: ❌ lseek SUCCEEDED — fd is STILL OPEN (soundfile did NOT close it)')
+          except OSError as exc:
+              print(f'RESULT: ✅ lseek FAILED errno={exc.errno} — fd is CLOSED correctly')
+          "
