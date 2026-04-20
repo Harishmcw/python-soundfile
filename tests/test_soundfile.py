@@ -46,9 +46,12 @@ def _file_existing(request, filename, fdarg, objarg=None):
         fd = os.open(filename, fdarg)
 
         def finalizer():
-            os.close(fd)
+            try:
+                os.close(fd)  # may already be closed by SoundFile on some platforms
+            except OSError:
+                pass
             with pytest.raises(OSError):
-                os.close(fd)
+                os.close(fd)  # this should ALWAYS raise since fd is now definitely closed
 
         request.addfinalizer(finalizer)
         return fd
